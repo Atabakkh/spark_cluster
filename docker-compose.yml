@@ -1,0 +1,90 @@
+version: "3.7"
+services:
+  pysparkmaster:
+    image: pysparkmaster:1.0.1
+    #      build:
+    #        context: .
+    container_name: pysparkmaster
+    hostname: pysparkmaster
+    tty: true
+    stdin_open: true
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./pyspark-apps:/code/pyspark-apps
+      - ./pyspark-data:/code/pyspark-data
+    environment:
+      - "SPARK_LOCAL_IP=pysparkmaster"
+    networks:
+      pysparknetwork:
+         ipv4_address: 172.26.0.2
+  pysparkworker1:
+    image: pysparkworker:1.0.1
+         #      build:
+         #        context: .
+    container_name: pysparkworker1
+    hostname: pysparkworker1
+    tty: true
+    stdin_open: true
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./pyspark-apps:/code/pyspark-apps
+      - ./pyspark-data:/code/pyspark-data
+    environment:
+      - "SPARK_LOCAL_IP=pysparkworker1"
+    depends_on:
+      - pysparkmaster
+    networks:
+      pysparknetwork:
+        ipv4_address: 172.26.0.3
+  pysparkworker2:
+    image: pysparkworker:1.0.1
+         #      build:
+         #        context: .
+    container_name: pysparkworker2
+    hostname: pysparkworker2
+    tty: true
+    stdin_open: true
+    ports:
+      - "8082:8081"
+    volumes:
+      - ./pyspark-apps:/code/pyspark-apps
+      - ./pyspark-data:/code/pyspark-data
+    environment:
+      - "SPARK_LOCAL_IP=pysparkworker2"
+    depends_on:
+      - pysparkmaster
+    networks:
+      pysparknetwork:
+        ipv4_address: 172.26.0.4
+  pysparkworker3:
+    image: pysparkworker:1.0.1
+         #      build:
+         #        context: .
+    container_name: pysparkworker3
+    hostname: pysparkworker3
+    tty: true
+    stdin_open: true
+    ports:
+      - "8083:8081"
+    volumes:
+      - ./pyspark-apps:/code/pyspark-apps
+      - ./pyspark-data:/code/pyspark-data
+    environment:
+      - "SPARK_LOCAL_IP=pysparkworker3"
+    depends_on:
+      - pysparkmaster
+    networks:
+      pysparknetwork:
+        ipv4_address: 172.26.0.5
+
+networks:
+  pysparknetwork:
+    driver: bridge
+    name: pysparknetwork
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.26.0.0/16
